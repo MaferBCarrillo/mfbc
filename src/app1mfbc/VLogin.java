@@ -5,6 +5,13 @@
  */
 package app1mfbc;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -133,14 +140,34 @@ public class VLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_mfemailActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        String email=mfemail.getText();
-        String password = String.valueOf(mfpassword.getPassword());
-        JOptionPane.showMessageDialog(this, email+" "+password);
-        String URL = "jdbc:mysql://localhost:3306/";
-        String USERNAME = "";
-        String PASSWORD = "";
-        String DATABASE = "login";
+        try {
+            // TODO add your handling code here:
+            String email=mfemail.getText();
+            String password = String.valueOf(mfpassword.getPassword());
+            String URL = "jdbc:mysql://127.0.0.1:3306/";
+            String USERNAME = "root";
+            String PASSWORD = "";
+            String DATABASE = "login?useSSL=false&serverTimezone=UTC";
+            
+            Connection connection;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(URL+DATABASE, USERNAME, PASSWORD);
+            String query ="select count(*) as user from user"+"where email =  '"+ email + "'and password = sha1('"+password+"')";
+            Statement stm= connection.createStatement();
+            ResultSet rs =stm.executeQuery(query);
+            if (rs.next()){
+                if(rs.getInt("user") == 1){
+                    JOptionPane.showMessageDialog(this, "Bienvenido");
+                }else{
+                            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrecta");
+                            }
+                }
+            connection.close();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(VLogin.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(VLogin.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
